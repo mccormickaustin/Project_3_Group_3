@@ -113,7 +113,7 @@ Austin McCormick
 
 Laurie Webb
 
-Kashi Zafar (UI, integration, and major enhancements)
+Kashi Zafar
 
 Final Project – OSU AI Bootcamp
 May 2025
