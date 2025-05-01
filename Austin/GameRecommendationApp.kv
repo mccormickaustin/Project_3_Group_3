@@ -1,0 +1,98 @@
+WindowManager:
+    FirstWindow:
+    SecondWindow:
+    ThirdWindow:
+
+<FirstWindow>:
+    name: "FirstWindow"
+
+    GridLayout:
+        cols: 1
+        padding: 20
+        spacing: 10
+
+        Label:
+            text: "Welcome To Your New Game Recommendation App!"
+            font_size: 40
+            halign: 'center'
+            valign: 'middle'
+
+        Button:
+            text: "Start"
+            font_size: 30
+            on_release:
+                app.root.current = 'SecondWindow'
+                app.root.transition.direction = "left"
+
+        Button:
+            text: "Exit"
+            font_size: 30
+            on_release: app.stop()
+
+<SecondWindow>:
+    name: "SecondWindow"
+
+    GridLayout:
+        cols: 1
+        padding: 20
+        spacing: 10
+
+        TextInput:
+            id: name_input
+            hint_text: "Enter Your Name"
+            multiline: False
+
+        TextInput:
+            id: email_input
+            hint_text: "Enter Your Email (Optional)"
+            multiline: False
+
+        TextInput:
+            id: games_played_input
+            hint_text: "Enter Games You Have Played (comma-separated)"
+            multiline: False
+
+        TextInput:
+            id: mood_input
+            hint_text: "Enter Your Current Mood (Relaxed, Intense, Strategic, Emotioanal, Scary, Funny)"
+            multiline: False
+
+        GridLayout:
+            cols: 2
+            size_hint: (0.8, 0.2)
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+            Button:
+                text: "Start Over"
+                on_release:
+                    app.root.current = 'FirstWindow'
+                    app.root.transition.direction = "right"
+
+            Button:
+                text: "Submit"
+                on_release:
+                    root.submit_info()
+                    app.root.current = 'ThirdWindow'
+                    app.root.transition.direction = "left"
+
+<ThirdWindow>:
+    name: "ThirdWindow"
+
+    GridLayout:
+        cols: 1
+        padding: 20
+        spacing: 10
+
+        Label:
+            id: recommendations_label
+            text: root.recommendation_text
+            font_size: 30
+            halign: 'center'
+            valign: 'middle'
+
+        Button:
+            text: "Go to Start"
+            font_size: 30
+            on_release:
+                app.root.current = 'FirstWindow'
+                app.root.transition.direction = "right"
