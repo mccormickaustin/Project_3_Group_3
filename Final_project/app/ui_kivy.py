@@ -43,8 +43,7 @@ class RecommenderUI(BoxLayout):
         self.add_widget(self.mood_selector)
 
         self.add_widget(Label(text="Genre:", font_size=16, color=(1, 1, 1, 1), size_hint=(1, 0.05)))
-        all_genres = sorted(set(tag.strip() for tags in self.df['tags'].dropna() for tag in tags.split(',')))
-        self.genre_selector = Spinner(text='None', values=['None'] + all_genres,
+        all_genres = sorted({tag.strip().lower() for tags in self.df['tags'].dropna() for tag in tags.split(',')})        self.genre_selector = Spinner(text='None', values=['None'] + all_genres,
                                       size_hint=(1, 0.08), background_color=(0.4, 0.4, 0.4, 1), color=(1, 1, 1, 1))
         self.add_widget(self.genre_selector)
 
