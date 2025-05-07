@@ -1,119 +1,154 @@
-# 🎮 Steam Game Recommender with Mood-Based Filtering & Game Details Viewer
+# 🎮 Steam Game Recommender
 
-## 📌 Overview
+This is a content-based recommender system that suggests Steam games based on a user's input — either a game title, genre, mood, or App ID. It uses text analysis and machine learning to recommend similar games and includes a clean, dark-themed interface built with Kivy.
 
-This project is a machine learning-based game recommendation system that suggests Steam games based on user input.  
-Users can:
+## 🔍 What This App Does
 
-- 🎯 Get 5 similar games based on a title and selected mood
-- 🔍 View detailed information about any game (price, platform, tags, description)
-- 🖥️ Use a desktop app with a dark-themed Kivy interface
+Recommends 14 similar games when a game title or Steam App ID is entered.
 
-Built using TF-IDF + KNN, this project demonstrates the full ML pipeline — from raw data to UI.
+Lets users filter games by mood (like brainy, relaxing, intense) or genre (Action, Puzzle, Horror, etc.).
 
----
+Displays key game details: App ID, title, platform support (Windows/macOS/Linux), release date, review count, rating, price, and a link to the Steam store page.
 
-## 🎯 Objectives
+Provides a scrollable, user-friendly interface with clickable links using Kivy.
+⭐ Features for Personalized Experience:
 
-- Recommend games based on user input and emotional "mood"
-- Provide detailed insights about a selected game
-- Showcase complete ML workflow with deployment-ready UI
-- Enhance personalization with mood filtering and game metadata
+- ⭐ Add games to a favorites list  
+- 📜 View your saved favorite games  
+- 🗑️ Clear all favorites with one click  
+- 💾 Export your favorites to a text file for later
 
----
+## 📁 Dataset Used
 
-## 📂 Dataset
+We used data from the Kaggle dataset:
 
-**Source:** [Game Recommendations on Steam (Kaggle)](https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam)
+🎮 [Game Recommendations on Steam – Kaggle](https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam?resource=download)
 
-Files used:
+This dataset includes:
 
-- `games.csv`: Base info (app ID, platform, price, reviews)
-- `games_metadata.json`: Tags and description
-- ✅ Merged on `app_id` → cleaned into `cleaned_games.csv`
-- ✅ Created:
-  - `combined_features` (tags + description)
-  - `mood` column (based on keywords)
-  - Platform + price + release date fields
+- `games.csv` — with titles, platform info, release dates, prices, and reviews.
+- `games_metadata.json` — with game descriptions and genre tags.
 
----
+These were merged using app_id and then cleaned. We engineered the following extra columns:
 
-## 🛠️ Technologies Used
+tags: Assigned based on keywords in title/description.
 
-| Tool/Library      | Purpose                             |
-|-------------------|-------------------------------------|
-| `pandas`          | Data loading and merging            |
-| `scikit-learn`    | TF-IDF vectorizer, KNN model        |
-| `pickle`          | Save trained models to disk         |
-| `Kivy`            | Desktop GUI with buttons, input     |
-| `JSON`, `CSV`     | Input files for raw game data       |
+mood: Custom labels like horror, intense, etc.
 
----
+combined_features: A string column combining tags + description for similarity calculation.
 
-## 💡 Mood Categories Used
+## 🧠 How It Works
 
-- `fun`
-- `horror`
-- `brainy`
-- `intense`
-- `relaxing`
-- `general`
+### Preprocessing
 
-🧠 Mood is assigned based on keywords found in tags or description.
+Cleaned game titles by removing special characters like ™, ®, and any non-standard symbols.
 
----
+Used keyword matching to assign each game a genre.
 
-## 🖥️ How to Run the App
+Tagged each game with a mood based on its description (e.g., "relaxing", "horror", "fun").
 
-### ✅ Step 1: Install dependencies
+Combined the tags and description into a single column for use in vectorization.
 
-```bash
-pip install -r requirements.txt
-✅ Step 2: Run the Kivy UI
-bash
-Copy
-Edit
-cd Final_project/app
+### TF-IDF + KNN Model
+
+Applied TF-IDF (Term Frequency-Inverse Document Frequency) to the combined features.
+
+Trained a KNN (K-Nearest Neighbors) model using cosine similarity to find similar games.
+
+Saved both the vector matrix and model using pickle.
+
+### Kivy UI
+
+Users can enter a title or App ID to see game details.
+
+Optional dropdowns for mood and genre filtering.
+
+Scrollable section shows results with links to each game’s Steam page.
+
+Clean layout using dark theme and visual spacing for clarity.
+
+### 🖥️ How to Run the App
+
+1. Clone or download this repository: [GitHub Repository](https://github.com/mccormickaustin/Project_3_Group_3.git)
+
+2. Ensure the following files exist:
+
+   ../data/cleaned_games.csv
+
+   ../models/knn_model.pkl
+
+   ../models/tfidf_matrix.pkl
+
+3. Install dependencies:
+
+   pip install kivy pandas scikit-learn
+
+4. Run the app:
+
 python ui_kivy.py
-🎮 App Features
-Enter a game title in the input field
 
-Select a mood from the dropdown
+## 👨‍💻 Technologies Used
 
-Click:
+Python
 
-View Details to see:
+Pandas
 
-Mood, price, platform, release date, tags, description
+Scikit-learn (TF-IDF, NearestNeighbors)
 
-Get Recommendations to see:
+Kivy (UI framework)
 
-5 games with similar tags and mood category
+Regex (for text cleaning)
 
-📸 Sample Output (Text)
-yaml
-Copy
-Edit
-• Portal 2
-  Windows, macOS | $9.99 | Released: 2011-04-19
+Pickle (to save/load models)
 
-• The Talos Principle
-  Windows, Linux | $29.99 | Released: 2014-12-11
-🚀 Future Improvements
-Use NLP or sentiment analysis to tag moods more accurately
+## 👨‍👩‍👧‍👦 Team Members (Group 3)
 
-Add genre, platform, or discount filters in UI
-
-Integrate Steam API for real-time prices and availability
-
-Deploy the app online via Gradio or Flask
-
-👤 Developed By
-Austin McCormick
+Austin Mccormick
 
 Laurie Webb
 
-Kashi Zafar
+Kashif Zafar
 
-Final Project – OSU AI Bootcamp
-May 2025
+We collaborated by splitting up tasks related to data cleaning, model training, and UI development. Communication and version control were done using GitHub, Slack, and VS Code.
+
+## 💡 What We Learned
+
+How to merge and clean large datasets from multiple sources.
+
+Writing logic to assign genres and moods when the data isn’t clean.
+
+How to build and save a working ML recommendation model.
+
+Building a real-time, scrollable UI using Kivy.
+
+Improving search flexibility by allowing both title and App ID lookups.
+
+Adding favorites features to create a more personalized experience.
+
+## ⚠️ Challenges We Faced
+
+Dealing with incomplete or messy metadata.
+
+Matching titles across datasets (some didn’t have exact matches).
+
+Getting the Kivy UI to scroll and resize properly.
+
+Making sure recommendations actually felt relevant and useful.
+
+Ensuring proper filtering when genre and mood were combined.
+
+Persisting favorites within a session and enabling export.
+
+## 🚀 Future Improvements
+
+If we continue this project, here are a few things we’d like to add:
+
+Steam API integration for live game data.
+
+Add game screenshots and trailers to the UI.
+
+Add charts/visuals to show popularity or genre distribution.
+
+Refine mood detection using NLP sentiment analysis or transformer models.
+
+Thanks for checking out our project — we hope you find a new favorite game through it! 🎮
