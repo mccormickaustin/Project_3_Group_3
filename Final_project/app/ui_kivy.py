@@ -130,16 +130,29 @@ class RecommenderUI(BoxLayout):
         row = game.iloc[0]
         price_val = row.get('price') or row.get('price_final')
         price = "Free" if pd.isna(price_val) or price_val == 0 else f"${price_val:.2f}"
-        release = row.get('release_date') or row.get('date_release') or ''
-        raw_date = str(release)[:10]
+
+        # ✅ Fixed release date handling
+        release = row.get('date_release_x') or row.get('date_release_y') or ''
+
+        date = str(release)
         try:
-            parsed_date = datetime.strptime(raw_date, "%Y-%m-%d")
-            date = parsed_date.strftime("%m-%d-%Y")
+            if isinstance(release, str) and re.match(r"\d{4}-\d{2}-\d{2}", release):
+                parsed_date = datetime.strptime(release[:10], "%Y-%m-%d")
+                date = parsed_date.strftime("%m-%d-%Y")
+            elif isinstance(release, str) and re.match(r"\d{4}-\d{2}", release):
+                parsed_date = datetime.strptime(release, "%Y-%m")
+                date = parsed_date.strftime("%m-%Y")
+            elif isinstance(release, (int, float)) and not pd.isna(release):
+                date = str(int(release))
         except:
-            date = raw_date
+            date = str(release)
 
         reviews = row.get('user_reviews', 'N/A')
-        platforms = [p for p, v in zip(['🖥 Windows', '🍏 macOS', '🐧 Linux'], [row.get('win'), row.get('mac'), row.get('linux')]) if v]
+        platforms = [p for p, v in zip(['🖥 Windows', '🍏 macOS', '🐧 Linux'],
+                               [row.get('win_x') or row.get('win_y'),
+                                row.get('mac_x') or row.get('mac_y'),
+                                row.get('linux_x') or row.get('linux_y')]) if v]
+
         app_link = f"https://store.steampowered.com/app/{row['app_id']}/"
         rating_label = str(row.get('rating', '')).strip().lower()
 
@@ -163,7 +176,6 @@ class RecommenderUI(BoxLayout):
         else:
             rating_text = "Not Rated"
 
-
         output = (
             f"[b]{row['title']}[/b]\n"
             f"[color=#ffa726]App ID:[/color] {row['app_id']} | [ref={app_link}][color=#42a5f5][u]Open on Steam[/u][/color][/ref]\n"
@@ -176,6 +188,7 @@ class RecommenderUI(BoxLayout):
             f"[i][color=#bdbdbd]Description:[/color] {row.get('description', '')}[/i]\n"
         )
         self.results.text = output
+
 
     def get_recommendations(self, instance):
         title = self.input_field.text.strip().lower()
@@ -231,28 +244,36 @@ class RecommenderUI(BoxLayout):
 
     def _format_dual_column_output(self, title, df):
         left, right = "", ""
-        # Show up to 5 recommended games, split into two columns
         for i, (_, row) in enumerate(df.head(5).iterrows()):
             number = f"{i+1}."
             price_val = row.get('price') or row.get('price_final')
             price = "Free" if pd.isna(price_val) or price_val == 0 else f"${price_val:.2f}"
 
-            # Format the release date as MM-DD-YYYY
-            release_val = row.get('release_date') or row.get('date_release') or ''
-            raw_date = str(release_val)[:10]
+            # ✅ Fixed release date handling
+            release_val = row.get('date_release_x') or row.get('date_release_y') or ''
+            
+            date = str(release_val)
             try:
-                parsed_date = datetime.strptime(raw_date, "%Y-%m-%d")
-                date = parsed_date.strftime("%m-%d-%Y")
+                if isinstance(release_val, str) and re.match(r"\d{4}-\d{2}-\d{2}", release_val):
+                    parsed_date = datetime.strptime(release_val[:10], "%Y-%m-%d")
+                    date = parsed_date.strftime("%m-%d-%Y")
+                elif isinstance(release_val, str) and re.match(r"\d{4}-\d{2}", release_val):
+                    parsed_date = datetime.strptime(release_val, "%Y-%m")
+                    date = parsed_date.strftime("%m-%Y")
+                elif isinstance(release_val, (int, float)) and not pd.isna(release_val):
+                    date = str(int(release_val))
             except:
-                date = raw_date
+                date = str(release_val)
 
             review_val = row.get('user_reviews') or row.get('user_reviews_x')
             reviews = f"{int(review_val)} reviews" if pd.notna(review_val) else "N/A"
             platforms = [p for p, v in zip(['🖥 Windows', '🍏 macOS', '🐧 Linux'],
-                                    [row.get('win'), row.get('mac'), row.get('linux')]) if v]
+                               [row.get('win_x') or row.get('win_y'),
+                                row.get('mac_x') or row.get('mac_y'),
+                                row.get('linux_x') or row.get('linux_y')]) if v]
+
             app_link = f"https://store.steampowered.com/app/{row['app_id']}/"
 
-            # Rating
             rating_label = str(row.get('rating', '')).strip().lower()
             rating_map = {
                 "overwhelmingly positive": 5.0, "very positive": 4.5, "mostly positive": 4.0,
@@ -268,13 +289,10 @@ class RecommenderUI(BoxLayout):
             else:
                 rating_text = row.get('rating', 'Not Rated')
 
-
-            # Info block
             info = (
                 f"{number} [ref={app_link}][color=#42a5f5][u]{row['title']}[/u][/color][/ref]\n"
                 f"   App ID: {row['app_id']} | {', '.join(platforms)} | {price} | Rating: {rating_text} | {reviews} | Released: {date}\n\n"
             )
-
 
             if i < 7:
                 left += info
@@ -282,6 +300,7 @@ class RecommenderUI(BoxLayout):
                 right += info
 
         return f"[b]{title}[/b]\n\n{left}{right}"
+
 
     def save_to_favorites(self, instance):
         title = self.input_field.text.strip().lower()
